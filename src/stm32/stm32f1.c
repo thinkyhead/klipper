@@ -112,6 +112,8 @@ clock_setup(void)
     if (CONFIG_CLOCK_REF_8M) {
         // Configure 72Mhz PLL from external 8Mhz crystal (HSE)
         RCC->CR |= RCC_CR_HSEON;
+        while (!(RCC->CR & RCC_CR_HSERDY))
+            ;
         cfgr = ((1 << RCC_CFGR_PLLSRC_Pos) | ((9 - 2) << RCC_CFGR_PLLMULL_Pos)
                 | RCC_CFGR_PPRE1_DIV2 | RCC_CFGR_PPRE2_DIV2
                 | RCC_CFGR_ADCPRE_DIV4);
