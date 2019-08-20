@@ -240,6 +240,7 @@ void
 usb_init(void)
 {
     // Pull the D+ pin low briefly to signal a new connection
+    udelay(10000);
     gpio_out_setup(GPIO('A', 12), 0);
     udelay(5000);
     gpio_in_setup(GPIO('A', 12), 0);
