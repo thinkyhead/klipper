@@ -114,24 +114,20 @@ clock_setup(void)
         RCC->CR |= RCC_CR_HSEON;
         while (!(RCC->CR & RCC_CR_HSERDY))
             ;
-        cfgr = ((1 << RCC_CFGR_PLLSRC_Pos) | ((9 - 2) << RCC_CFGR_PLLMULL_Pos)
-                | RCC_CFGR_PPRE1_DIV2 | RCC_CFGR_PPRE2_DIV2
-                | RCC_CFGR_ADCPRE_DIV4);
+        cfgr = (1 << RCC_CFGR_PLLSRC_Pos) | ((9 - 2) << RCC_CFGR_PLLMULL_Pos);
     } else {
         // Configure 72Mhz PLL from internal 8Mhz oscillator (HSI)
-        cfgr = ((0 << RCC_CFGR_PLLSRC_Pos) | ((18 - 2) << RCC_CFGR_PLLMULL_Pos)
-                | RCC_CFGR_PPRE1_DIV2 | RCC_CFGR_PPRE2_DIV2
-                | RCC_CFGR_ADCPRE_DIV4);
+        cfgr = (0 << RCC_CFGR_PLLSRC_Pos) | ((18 - 2) << RCC_CFGR_PLLMULL_Pos);
     }
     RCC->CFGR = cfgr;
     RCC->CR |= RCC_CR_PLLON;
+    while (!(RCC->CR & RCC_CR_PLLRDY))
+        ;
+    RCC->CFGR = (cfgr | RCC_CFGR_PPRE1_DIV2 | RCC_CFGR_PPRE2_DIV2
+                 | RCC_CFGR_ADCPRE_DIV4);
 
     // Set flash latency
     FLASH->ACR = (2 << FLASH_ACR_LATENCY_Pos) | FLASH_ACR_PRFTBE;
-
-    // Wait for PLL lock
-    while (!(RCC->CR & RCC_CR_PLLRDY))
-        ;
 
     // Switch system clock to PLL
     RCC->CFGR = cfgr | RCC_CFGR_SW_PLL;
